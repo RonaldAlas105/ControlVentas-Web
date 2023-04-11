@@ -1,0 +1,210 @@
+﻿@{
+    ViewBag.Title = "Productos";
+    Layout = "~/Views/shared/_Layout.cshtml";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <script>
+        Swal.fire({
+            title: '¡Éxito!',
+            text: '@TempData["SuccessMessage"]',
+            icon: 'success',
+            confirmButtonText: 'Aceptar'
+        });
+    </script>
+}
+
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-sm-12 col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>GUARDAR PRODUCTO</h4>
+                </div>
+                <div class="card-body">
+                    <form action="@Url.Action("Guardar","Producto")" method="post" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="Nombre">Nombre</label>
+                            <input type="text" class="form-control" id="Nombre" name="Nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label></label>
+
+
+                            <label id="lblCategoriaSeleccionada" for="slIdCategoria" class="form-label"> Seleccionar Categoria:</label>
+                            <select id="slCategoria" name="IdCategoria" onchange="actualizarCategoriaSeleccionada()" class="form-select"></select>
+                        </div>
+                        <div class="form-group">
+                            <label id="lblMarcaSeleccionada" for="slIdMarca" class="form-label"> Seleccionar Marca:</label>
+                            <select id="slMarca" name="IdMarca" onchange="actualizarMarcaSeleccionada()" class="form-select"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="Descripcion">Descripcion</label>
+                            <input type="text" class="form-control" id="Descripcion" name="Descripcion" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="PrecioCompra">Precio Compra</label>
+                            <input type="text" class="form-control" id="PrecioCompra" name="PrecioCompra" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="PrecioVenta">Precio Venta</label>
+                            <input type="text" class="form-control" id="PrecioVenta" name="PrecioVenta" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="Cantidad">Cantidad</label>
+                            <input type="text" class="form-control" id="Cantidad" name="Cantidad" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="Img">Archivo</label>
+                            <input type="file" class="form-control" id="Img" name="Img" onchange="previewImage(this)" required>
+                        </div>
+                        <div class="form-group">
+                            <img id="preview" src="#" alt="Your image preview will appear here" style="display: none; width: 200px; height: 200px;">
+                        </div>
+                        <br />
+
+                        <div>
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                            <a class="btn btn-primary" href="@Url.Action("VerProductos", "Producto")">Ver Productos</a>
+                        </div>
+
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#preview').attr('src', e.target.result);
+                $('#preview').show();
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+
+
+
+
+
+<!------------------------------------------------MODAL------------------------------------------>
+
+
+
+@section Scripts{
+    <script>
+
+        function actualizarCategoriaSeleccionada() {
+            var categoriaSeleccionada = $("#slCategoria option:selected").text();
+            $("#lblCategoriaSeleccionada").text(categoriaSeleccionada);
+        }
+
+        function actualizarMarcaSeleccionada() {
+            var marcaSeleccionada = $("#slMarca option:selected").text();
+            $("#lblMarcaSeleccionada").text(marcaSeleccionada);
+        }
+
+          function fnCargarListaCategorias() {
+            $.ajax({
+                method: 'POST',
+                url: '@Url.Action("ObtenerCategorias","Producto")',
+                datatype: JSON,
+                success: function (lista) {
+                    $("#slCategoria, #slCategoriaB").append("<option value='0'> SELECCIONAR</option>");
+                    for (var i = 0; i < lista.length; i++) {
+                        $("#slCategoria, #slCategoriaB").append("<option value='" + lista[i].Id + "'>" + lista[i].Nombre + "</option>");
+                    }
+                },
+                error: function (error) {
+                    alert("Error:" + error.statusText);
+                }
+            });
+        }
+
+
+
+
+
+
+        //LISTA PARA MARCA
+       function fnCargarListaMarcas() {
+            $.ajax({
+                method: 'POST',
+                url: '@Url.Action("ObtenerMarcas","Producto")',
+                datatype: JSON,
+                success: function (lista) {
+                    $("#slMarca, #slMarcaB").append("<option value='0'> SELECCIONAR</option>");
+                    for (var i = 0; i < lista.length; i++) {
+                        $("#slMarca,#slMarcaB").append("<option value='" + lista[i].Id + "'>" + lista[i].Nombre + "</option>");
+                    }
+                },
+                error: function (error) {
+                    alert("Error:" + error.statusText);
+                }
+            });
+        }
+
+
+
+
+
+
+        $("#btnBuscar").click(function () {
+            fnBuscar();
+             });
+        function fnBuscar() {
+           $.ajax({
+           method: 'POST',
+           url: '@Url.Action("Buscar","Producto")',
+             data: $("#frmBuscar").serialize(),
+             datatype: JSON,
+                success: function (lista) {
+                  var productsContainer = $(".products-container");
+                  productsContainer.empty();
+                   for (var i = 0; i < lista.length; i++) {
+                      var imagen = "data:image/jpeg;base64," + btoa(String.fromCharCode.apply(null, new Uint8Array(lista[i].Img)));
+                           var product = "\
+                          <div class='product'>\
+                         <img src='" + imagen + "' alt='Product " + (i + 1) + "'>\
+                         <h3>" + lista[i].Nombre + "</h3>\
+                         <p>Categoría: " + lista[i].Categoria.Nombre + "</p>\
+                         <p>Marca: " + lista[i].Marca.Nombre + "</p>\
+                         <p>Descripción: " + lista[i].Descripcion + "</p>\
+                         <p>Precio: $" + lista[i].Inventario.PrecioVenta + "</p>\
+                         <p>Stock: " + lista[i].Inventario.Cantidad + "</p>\
+                        </div>";
+                             productsContainer.append(product);
+
+                   }
+
+               },
+               error: function (error) {
+                                   alert("Error:" + error.statusText);
+               }
+
+           });
+
+
+        }
+
+
+
+
+
+        $(document).ready(function () {
+            fnCargarListaCategorias();
+            fnCargarListaMarcas();
+        });
+
+    </script>
+}

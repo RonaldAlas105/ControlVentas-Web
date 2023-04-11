@@ -1,0 +1,516 @@
+﻿@{
+    ViewBag.Title = "Venta";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@* Comentario *@
+<div class="offcanvas offcanvas-end" tabindex="-1" id="AgregarUsuario" aria-labelledby="offcanvasRightLabel">
+    <div class="offcanvas-header">
+        <h5 id="offcanvasRightLabel"> Agregar Usuario </h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+
+        <div class="row g-3">
+            <div class="col-12">
+                <label for="txtNombre" class="col-form-label">Nombre Completo:</label>
+                <input type="text" class="form-control" id="txtNombre" name="NombreCompleto" />
+            </div>
+            <div class="col-6">
+                <label for="txtDUI" class="col-form-label">DUI:</label>
+                <input type="text" class="form-control" id="txtDUI" name="DUI" />
+            </div>
+            <div class="col-6">
+                <label for="txtTelefono" class="col-form-label">Telefono:</label>
+                <input type="text" class="form-control" id="txtTelefono" name="Telefono" />
+            </div>
+            <div class="col-12">
+                <label for="txtDireccion" class="col-form-label">Direccion:</label>
+                <input type="text" class="form-control" id="txtDireccion" name="Direccion" />
+            </div>
+            <div>
+                <button type="button" class="btn btn-primary " id="btnConfirmar">Confirmar</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+
+<div class="row justify-content-center">
+    <div class="col-10">
+        <form class="card text-bg-light mb-3" id="frmBuscar">
+            <div class="card-header text-center fw-bold h1 bg-primary text-light"> Punto de venta </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-3">
+                        <label for="slClienteB" class="form-label"> Seleccionar cliente:</label>
+                        <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#AgregarUsuario" aria-controls="offcanvasRight"> + </button> <br />
+                        <select id="slClienteB" name="IdCliente" class="form-select"></select>
+                    </div>
+                    <div class="col-2">
+                        <label for="txtFechaRegistroB" class="form-label">Fecha de registro:</label>
+                        <input type="date" class="form-control" id="txtFechaRegistroB" name="FechaRegistro" />
+                    </div>
+                    <div class="col-2">
+                        <label for="slPagoB" class="form-label">Pago:</label>
+                        <select id="slPagoB" class="form-select" name="Pago">
+                            <option value="0">SELECCIONAR</option>
+                            <option>EFECTIVO</option>
+                            <option>TARJETA</option>
+                        </select>
+                    </div>
+                    <div class="col-2">
+                        <label for="slEstatusB" class="form-label">Estatus:</label>
+                        <select id="slEstatusB" class="form-select" name="Estatus">
+                            <option value="0">SELECCIONAR</option>
+                            <option value="1">CREADO</option>
+                            <option value="2">CERRADO</option>
+                            <option value="3">ANULADO</option>
+                        </select>
+                    </div>
+                    <div class="col-2 d-flex align-items-end">
+                        <button type="button" id="btnBuscar" class="btn btn-primary me-2">Buscar</button>
+                        <button type="button" id="btnNuevo" class="btn btn-secondary me-2">Nuevo</button>
+                        <button class="btn btn-danger" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"> Reportes</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="w-100"></div>
+    <div class="col-8">
+        <table class="table table-striped table-active" id="tbDatosVenta">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Cliente</th>
+                    <th>Fecha de registro</th>
+                    <th>Pago</th>
+                    <th>Estatus</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+</div>
+
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+    <div class="offcanvas-header">
+        <h5 id="offcanvasRightLabel">Descarga de reportes</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <p>Para poder descagar los resportes primero seleccione su fecha inicial y final</p>
+        <form method="post" action="@Url.Action("DescargarDatos", "Venta")">
+            <label for="fechaInicio" class="form-label">Fecha de inicio:</label>
+            <input class="form-control" type="date" id="fechaInicio" name="fechaInicio" />
+            <label for="fechaFin" class="form-label">Fecha de fin:</label>
+            <input class="form-control" type="date" id="fechaFin" name="fechaFin" />
+            <br />
+            <input type="submit" class="btn btn-primary" value="Descargar" />
+        </form>
+    </div>
+</div>
+
+
+<!---MODAL-->
+<div class="modal" tabindex="-1" id="mdlMantVenta">
+    <form class="modal-dialog modal-lg" id="frmMantVenta">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mdlTitulo"> Nueva Venta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="txtId" name="Id" />
+                <div class="row g-3">
+                    <div class="col-3">
+                        <label for="slCliente" class="form-label"> Seleccionar cliente:</label>
+                        <select id="slCliente" name="IdCliente" class="form-select"></select>
+                    </div>
+                    <div class="col-3">
+                        <label for="slPago" class="form-label">Tipo de pago:</label>
+                        <select id="slPago" class="form-select" name="Pago">
+                            <option value="0">SELECCIONAR</option>
+                            <option>TARJETA</option>
+                            <option>EFECTIVO</option>
+                        </select>
+                    </div>
+                    <div class="col-3">
+                        <label for="slEstatus" class="form-label">Estatus:</label>
+                        <select id="slEstatus" class="form-select" name="Estatus">
+                            <option value="0">SELECCIONAR</option>
+                            <option value="1">CREADO</option>
+                            <option value="2">CERRADO</option>
+                            <option value="3">ANULADO</option>
+                        </select>
+                    </div>
+                    <div class="col-3">
+                        <label for="txtFechaRegistro" class="form-label">Fecha de registro:</label>
+                        <input type="date" class="form-control" id="txtFechaRegistro" name="FechaRegistro" readonly />
+                    </div>
+
+                    <div class="col-12 container-fluid border mt-3 p-4 rounded">
+                        <div class="row">
+                            <div class="col-6">
+                                <label for="slProducto" class="form-label">Seleccionar producto:</label>
+                                <select id="slProducto" class="form-select" style="width:100%;"></select>
+                            </div>
+                            <div class="col-2">
+                                <label for="txtPrecio" class="form-label">Precio:</label>
+                                <input type="text" class="form-control" id="txtPrecio" readonly />
+                            </div>
+                            <div class="col-2">
+                                <label for="txtCantidad" class="form-label">Cantidad:</label>
+                                <input type="text" class="form-control" id="txtCantidad" />
+                            </div>
+                            <div class="col-2 d-flex align-items-end">
+                                <button type="button" id="btnAgregar" class="btn btn-success w-100"
+                                        onclick="fnAgregarProducto()">
+                                    Agregar
+                                </button>
+                            </div>
+
+                            <div class="col-12">
+                                <table id="tbDetalleVenta" class="table table-striped table-bordered mt-3">
+                                    <thead>
+                                        <tr>
+                                            <th hidden>Id</th>
+                                            <th hidden>Id Producto</th>
+                                            <th>Producto</th>
+                                            <th>Precio</th>
+                                            <th>Cantidad</th>
+                                            <th>SubTotal</th>
+                                            <th>Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnConfirmar">Confirmar</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts{
+    <script src="~/Scripts/grid-detail.js"></script>
+    <script>
+        // Sintaxis de JQuery: $(selector).funcion()
+
+        // SECCION PARA CARGAR LISTA DE SELECCION / COMBOBOX
+        function fnCargarListaProductos() {
+            $.ajax({
+                method: 'POST',
+                url: '@Url.Action("ObtenerProductos", "Venta")',
+                datatype: JSON,
+                success: function (lista) {
+                    $("#slProducto").append("<option data-precio='0' value='0'>SELECCIONAR</option>");
+                    for (var i = 0; i < lista.length; i++) {
+                        $("#slProducto").append("<option data-precio='" + lista[i].Inventario.PrecioVenta + "' value='" + lista[i].Id + "'>" + lista[i].Nombre + "</option>");
+                        $("#slProducto").change(function () {
+                            var precio = $("#slProducto option:selected").attr("data-precio");
+                            $("#txtPrecio").val(precio);
+                        });
+                    }
+                },
+                error: function (error) {
+                    alert("Error:" + error.statusText);
+                }
+            });
+        }
+
+                //Sintaxis de JQUERY : $(selector).funcion()
+
+        //SECCION PARA CARGAR LISTA DE SELECCION / COMBOBOX
+        //LISTA PARA CATEGORIA
+        function fnCargarListaClientes() {
+            $.ajax({
+                method: 'POST',
+                url: '@Url.Action("ObtenerClientes", "Venta")',
+                datatype: JSON,
+                success: function (lista) {
+                    $("#slCliente, #slClienteB").append("<option value='0'> SELECCIONAR</option>");
+                    for (var i = 0; i < lista.length; i++) {
+                        $("#slCliente, #slClienteB").append("<option value='" + lista[i].Id + "'>" + lista[i].NombreCompleto + "</option>");
+                    }
+                },
+                error: function (error) {
+                    alert("Error:" + error.statusText);
+                }
+
+            });
+        }
+
+
+        //GO
+        // SECCION DE BUSCAR
+       //divisor de registros
+
+       var currentPage = 1;
+var itemsPerPage = 5;
+
+$("#btnBuscar").click(function () {
+    fnBuscar();
+});
+
+function fnBuscar() {
+    $.ajax({
+        method: 'POST',
+        url: '@Url.Action("Buscar","Venta")',
+        data: $("#frmBuscar").serialize(),
+        datatype: JSON,
+        success: function (lista) {
+            var tbody = $("#tbDatosVenta > tbody");
+            tbody.empty();
+            var startIndex = (currentPage - 1) * itemsPerPage;
+            var endIndex = startIndex + itemsPerPage;
+            for (var i = startIndex; i < endIndex && i < lista.length; i++) {
+                var fila = "<tr>\
+                                <td>" + lista[i].Id + "</td>\
+                                <td>" + lista[i].Cliente.NombreCompleto+ "</td>\
+                                <td>" + getDateTime(lista[i].FechaRegistro) + "</td>\
+                     <td>" + lista[i].Pago + "</td>\
+                                <td>" + lista[i].EstatusStr + "</td>\
+                                <td>\
+                                    <button type='button' class='btn btn-warning me-2' onclick='fnObtenerDatosModificar(" + lista[i].Id + ")'>Editar</button>\
+                                    <button type='button' class='btn btn-danger' onclick='fnEliminar(" + lista[i].Id + ")'>Eliminar</button>\
+                                    <a target='_blank' class='btn btn-info'  href='@Url.Action("Imprimir", "Venta")?pId=" + lista[i].Id + "'>Print</a>\
+                                </td>\
+                            </tr>";
+                tbody.append(fila);
+            }
+            updatePagination(lista.length);
+        },
+        error: function (error) {
+            alert("Error: " + error.statusText)
+        }
+    });
+}
+
+function updatePagination(totalItems) {
+    var totalPages = Math.ceil(totalItems / itemsPerPage);
+    var paginationContainer = $(".pagination");
+    paginationContainer.empty();
+    for (var i = 1; i <= totalPages; i++) {
+        var pageButton = "<button class='page-number'>" + i + "</button>";
+        paginationContainer.append(pageButton);
+    }
+    $(".page-number").click(function () {
+        currentPage = parseInt($(this).text());
+        fnBuscar();
+    });
+}
+
+        // SECCION DE NUEVO Y EDITAR
+        const mdlMantVenta = new bootstrap.Modal('#mdlMantVenta', { keyboard: false, backdrop: 'static' });
+
+        $("#btnNuevo").click(function () {
+            $("#mdlTitulo").text("Nueva Venta");
+            mdlMantVenta.show();
+            gdDetalleVenta.limpiar();
+        });
+
+        function fnObtenerDatosModificar(pId) {
+            $.ajax({
+                method: 'POST',
+                url: '@Url.Action("BuscarPorId", "Venta")',
+                data: { 'pId': pId },
+                datatype: JSON,
+                success: function (objVenta) {
+                    $("#txtId").val(objVenta.Id);
+                    $("#txtCliente").val(objVenta.Cliente);
+                    $("#slPago").val(objVenta.Pago);
+                    $("#slEstatus").val(objVenta.Estatus);
+                    $("#txtFechaRegistro").val(setDateTime(objVenta.FechaRegistro));
+
+                    // Grid Detail - Cargar detalles de venta
+                    gdDetalleVenta.limpiar();
+                    var lista = objVenta.Detalles;
+                    for (var i = 0; i < lista.length; i++) {
+                        fnCargarDetalle({
+                            Id: lista[i].Id,
+                            IdProducto: lista[i].IdProducto,
+                            NombreProducto: lista[i].Producto.Nombre,
+                            Precio: lista[i].Precio,
+                            Cantidad: lista[i].Cantidad,
+                            SubTotal: lista[i].SubTotal,
+                        });
+                    }
+                    gdDetalleVenta.bloquear();
+                    // Fin Grid Detail
+
+                    $("#mdlTitulo").text("Editar Venta");
+                    mdlMantVenta.show();
+                },
+                error: function (error) {
+                    alert("Error: " + error.statusText);
+                }
+            });
+        }
+
+        // EVENTO MODAL
+        document.getElementById("mdlMantVenta").addEventListener('hidden.bs.modal', function () {
+            // Evento cuando se cierra el modal
+            // Limpiar controles
+            $("#txtId").val("");
+            $("#txtCliente").val("");
+        });
+
+        function fnConfirmarDatos() {
+            // Por defecto se desar guardar un registro nuevo
+            var urlAccion = '@Url.Action("Guardar","Venta")';
+
+            if (parseInt($("#txtId").val()) > 0) {
+                // Se desea modificar el registro
+                urlAccion = '@Url.Action("Modificar","Venta")';
+            }
+
+            $.ajax({
+                method: 'POST',
+                url: urlAccion,
+                data: $("#frmMantVenta").serialize(),
+                datatype: JSON,
+                success: function (resultado) {
+                    if (resultado > 0) {
+
+                        Swal.fire(
+                            'Listo',
+                            'Los datos se guardaron exitosamente',
+                            'success'
+                        )
+                        fnBuscar();
+                        mdlMantVenta.hide();
+                        gdDetalleVenta.limpiar();
+                    }
+                    else {
+                        Swal.fire(
+                            'Alerta',
+                            'Ocurrio un error al guardar los datos en el servidor',
+                            'warning'
+                        )
+                    }
+                },
+                error: function (error) {
+                    alert("Errro: " + error.statusText);
+                }
+            });
+        }
+
+        $("#btnConfirmar").click(function () {
+            fnConfirmarDatos();
+        });
+
+        // SECCION DE ELIMINAR
+                function fnEliminar(pId) {
+            Swal.fire({
+                title: 'Seguro',
+                text: "¿Está seguro de eliminar el registro seleccionado?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Si, eliminar!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                $.ajax({
+                    method: 'POST',
+                    url: '@Url.Action("Eliminar","Venta")',
+                    data: { 'Id': pId },
+                    datatype: JSON,
+                    success: function (resultado) {
+                        if (resultado > 0) {
+                            // alert("El registro se elimino exitosamente");
+                            Swal.fire(
+                                'Listo!',
+                                'El registro se elimino exitosamente.',
+                                'success'
+                            );
+                            fnBuscar();
+                        }
+                        else {
+                            //alert("Ocurrio un error al eliminar un registro en el servidor");
+                            Swal.fire(
+                                'Alerta!',
+                                'Ocurrio un error al eliminar el registro en el servidor',
+                                'warning'
+                            );
+                        }
+                    },
+                    error: function (error) {
+                        alert("Error: " + error.statusText);
+                    }
+                });
+                }
+            });
+        }
+
+        // ------------------ GRID DETAIL ---------------------
+        var gdDetalleVenta = new gridDetail("gdDetalleVenta");
+        gdDetalleVenta.selector = "tbDetalleVenta";
+        // Propiedad para almacenar los detalles de venta en memoria
+        gdDetalleVenta.lista = "Detalles";
+
+        function fnCargarDetalle(pObj) {
+            gdDetalleVenta.agregarDetalle(function (pGD) {
+                var cols = "";
+
+                cols += pGD.agregarCol("Id", pObj.Id, false);
+                cols += pGD.agregarCol("IdProducto", pObj.IdProducto, false);
+                cols += pGD.agregarCol("NombreProducto", pObj.NombreProducto, true, 240); // No es propiedad de DetalleVenta
+                cols += pGD.agregarCol("Precio", pObj.Precio);
+                cols += pGD.agregarCol("Cantidad", pObj.Cantidad);
+                cols += pGD.agregarCol("SubTotal", pObj.SubTotal);
+
+                return cols;
+            });
+        }
+
+        function fnAgregarProducto() {
+            var objDet = {};
+
+            objDet.Id = 0;
+            objDet.IdProducto = $("#slProducto").val();
+            objDet.NombreProducto = $("#slProducto option:selected").text();
+            objDet.Precio = $("#txtPrecio").val();
+            objDet.Cantidad = parseInt($("#txtCantidad").val());
+            objDet.SubTotal = (parseFloat($("#txtPrecio").val()) * objDet.Cantidad).toFixed(2);
+            objDet.SubTotal = objDet.SubTotal;
+
+            if (objDet.IdProducto > 0 && objDet.Cantidad > 0) {
+                fnCargarDetalle(objDet);
+                $("#slProducto").val(0);
+                $("#txtPrecio").val("");
+                $("#txtCantidad").val("");
+            }
+            else {
+                alert("Por favor seleccione un producto e ingrese la cantidad");
+            }
+
+        }
+
+
+
+
+        // SECCION DE INICIALIZAR VISTA - DEJAR AL FINAL DEL SCRIPT JS
+        // Evento cuando la vista se carga en el navegador
+        $(document).ready(function () {
+            fnCargarListaProductos();
+            fnCargarListaClientes();
+        });
+
+
+    </script>
+}

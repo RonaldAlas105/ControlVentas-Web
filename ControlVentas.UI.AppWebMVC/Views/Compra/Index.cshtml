@@ -1,0 +1,423 @@
+﻿
+@{
+    ViewBag.Title = "Compra";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row justify-content-center">
+    <div class="col-8">
+        <form class="card text-bg-light mb-3" id="frmBuscar">
+            <div class="card-header text-center fw-bold h1 bg-primary text-light"> Compra de mercaderia </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-4">
+                        <label for="slProveedorB" class="form-label"> Seleccionar proveedor:</label>
+                        <select id="slProveedorB" name="IdProveedor" class="form-select"></select>
+                    </div>
+                    <div class="col-2">
+                        <label for="txtFechaRegistroB" class="form-label">Fecha de registro:</label>
+                        <input type="date" class="form-control" id="txtFechaRegistroB" name="FechaRegistro" />
+                    </div>
+                    <div class="col-3">
+                        <label for="slEstatusB" class="form-label">Estatus:</label>
+                        <select id="slEstatusB" class="form-select" name="Estatus">
+                            <option value="0">SELECCIONAR</option>
+                            <option value="1">CREADO</option>
+                            <option value="2">CERRADO</option>
+                            <option value="3">ANULADO</option>
+                        </select>
+                    </div>
+                    <div class="col-3 d-flex align-items-end">
+                        <button type="button" id="btnBuscar" class="btn btn-primary me-2">Buscar</button>
+                        <button type="button" id="btnNuevo" class="btn btn-secondary">Nuevo</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!----------------Datos a mostrar en lista-------------->
+
+    <div class="w-100"></div>
+    <div class="col-8">
+        <table class="table table-striped table-bordered" id="tbDatosCompra">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Proveedor</th>
+                    <th>Fecha de registro</th>
+                    <th>Estatus</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+</div>
+
+<div class="modal" tabindex="-1" id="mdlMantCompra">
+    <form class="modal-dialog modal-lg" id="frmMantCompra">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mdlTitulo"> Nueva Compra</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="txtId" name="Id" />
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label for="slProveedor" class="form-label"> Seleccionar proveedor:</label>
+                        <select id="slProveedor" name="IdProveedor" class="form-select"></select>
+                    </div>
+                    <div class="col-3">
+                        <label for="slEstatus" class="form-label">Estatus:</label>
+                        <select id="slEstatus" class="form-select" name="Estatus">
+                            <option value="0">SELECCIONAR</option>
+                            <option value="1">CREADO</option>
+                            <option value="2">CERRADO</option>
+                            <option value="3">ANULADO</option>
+                        </select>
+                    </div>
+                    <div class="col-3">
+                        <label for="txtFechaRegistro" class="form-label">Fecha de registro:</label>
+                        <input type="date" class="form-control" id="txtFechaRegistro" name="FechaRegistro" readonly />
+                    </div>
+
+                    <div class="col-12 container-fluid border mt-3 p-4 rounded">
+                        <div class="row">
+                            <div class="col-6">
+                                <label for="slProducto" class="form-label">Seleccionar producto:</label>
+                                <select id="slProducto" class="form-select" style="width:100%;"></select>
+                            </div>
+                            <div class="col-2">
+                                <label for="txtPrecio" class="form-label">Precio:</label>
+                                <input type="text" class="form-control" id="txtPrecio"  />
+                            </div>
+                            <div class="col-2">
+                                <label for="txtCantidad" class="form-label">Cantidad:</label>
+                                <input type="text" class="form-control" id="txtCantidad" />
+                            </div>
+                            <div class="col-2 d-flex align-items-end">
+                                <button type="button" id="btnAgregar" class="btn btn-success w-100"
+                                        onclick="fnAgregarProducto()">
+                                    Agregar
+                                </button>
+                            </div>
+
+                            <div class="col-12">
+                                <table id="tbDetalleCompra" class="table table-striped table-bordered mt-3">
+                                    <thead>
+                                        <tr>
+                                            <th hidden>Id</th>
+                                            <th hidden>Id Producto</th>
+                                            <th>Producto</th>
+                                            <th>Precio</th>
+                                            <th>Cantidad</th>
+                                            <th>SubTotal</th>
+                                            <th>Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnConfirmar">Confirmar</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+
+@section Scripts{
+    <script src="~/Scripts/grid-detail.js"></script>
+    <script>
+        // Sintaxis de JQuery: $(selector).funcion()
+
+        // SECCION PARA CARGAR LISTA DE SELECCION / COMBOBOX
+        function fnCargarListaProductos() {
+            $.ajax({
+                method: 'POST',
+                url: '@Url.Action("ObtenerProductos", "Compra")',
+                datatype: JSON,
+                success: function (lista) {
+                    $("#slProducto").append("<option data-precio='0' value='0'>SELECCIONAR</option>");
+                    for (var i = 0; i < lista.length; i++) {
+                        $("#slProducto").append("<option value='" + lista[i].Id + "'>" + lista[i].Nombre + "</option>");
+                        $("#slProducto").change(function () {
+                            var precio = $("#slProducto option:selected").attr("data-precio");
+                            $("#txtPrecio").val(precio);
+                        });
+                    }
+                },
+                error: function (error) {
+                    alert("Error:" + error.statusText);
+                }
+            });
+        }
+
+                //Sintaxis de JQUERY : $(selector).funcion()
+
+        //SECCION PARA CARGAR LISTA DE SELECCION / COMBOBOX
+        //LISTA PARA CATEGORIA
+        function fnCargarListaProveedores() {
+            $.ajax({
+                method: 'POST',
+                url: '@Url.Action("ObtenerProveedores", "Compra")',
+                datatype: JSON,
+                success: function (lista) {
+                    $("#slProveedor, #slProveedorB").append("<option value='0'> SELECCIONAR</option>");
+                    for (var i = 0; i < lista.length; i++) {
+                        $("#slProveedor, #slProveedorB").append("<option value='" + lista[i].Id + "'>" + lista[i].Nombre + "</option>");
+                    }
+                },
+                error: function (error) {
+                    alert("Error:" + error.statusText);
+                }
+
+            });
+        }
+
+
+
+        // SECCION DE BUSCAR
+        $("#btnBuscar").click(function () {
+            fnBuscar();
+        });
+
+        function fnBuscar() {
+            $.ajax({
+                method: 'POST',
+                url: '@Url.Action("Buscar","Compra")',
+                data: $("#frmBuscar").serialize(),
+                datatype: JSON,
+                success: function (lista) {
+                    var tbody = $("#tbDatosCompra > tbody");
+                    tbody.empty();
+                    for (var i = 0; i < lista.length; i++) {
+                        var fila = "<tr>\
+                                        <td>" + lista[i].Id + "</td>\
+                                        <td>" + lista[i].Proveedor.Nombre + "</td>\
+                                        <td>" + getDateTime(lista[i].FechaRegistro) + "</td>\
+                                        <td>" + lista[i].EstatusStr + "</td>\
+                                        <td>\
+                                            <button type='button' class='btn btn-warning me-2' onclick='fnObtenerDatosModificar(" + lista[i].Id + ")'>Editar</button>\
+                                            <button type='button' class='btn btn-danger' onclick='fnEliminar(" + lista[i].Id + ")'>Eliminar</button>\
+                                            <a target='_blank' class='btn btn-info'  href='@Url.Action("Imprimir", "Compra")?pId=" + lista[i].Id + "'>Print</a>\
+                                        </td>\
+                                    </tr>";
+                        tbody.append(fila);
+                    }
+                },
+                error: function (error) {
+                    alert("Error: " + error.statusText)
+                }
+            });
+        }
+
+        // SECCION DE NUEVO Y EDITAR
+        const mdlMantCompra = new bootstrap.Modal('#mdlMantCompra', { keyboard: false, backdrop: 'static' });
+
+        $("#btnNuevo").click(function () {
+            $("#mdlTitulo").text("Nueva Compra");
+            mdlMantCompra.show();
+            gdDetalleCompra.limpiar();
+        });
+
+        function fnObtenerDatosModificar(pId) {
+            $.ajax({
+                method: 'POST',
+                url: '@Url.Action("BuscarPorId", "Compra")',
+                data: { 'pId': pId },
+                datatype: JSON,
+                success: function (objCompra) {
+                    $("#txtId").val(objCompra.Id);
+                    $("#txtProveedor").val(objCompra.Proveedor);
+                    $("#slEstatus").val(objCompra.Estatus);
+                    $("#txtFechaRegistro").val(setDateTime(objCompra.FechaRegistro));
+
+                    // Grid Detail - Cargar detalles de venta
+                    gdDetalleCompra.limpiar();
+                    var lista = objCompra.Detalles;
+                    for (var i = 0; i < lista.length; i++) {
+                        fnCargarDetalle({
+                            Id: lista[i].Id,
+                            IdProducto: lista[i].IdProducto,
+                            NombreProducto: lista[i].Producto.Nombre,
+                            Precio: lista[i].Precio,
+                            Cantidad: lista[i].Cantidad,
+                            SubTotal: lista[i].SubTotal,
+                        });
+                    }
+                    gdDetalleCompra.bloquear();
+                    // Fin Grid Detail
+
+                    $("#mdlTitulo").text("Editar Compra");
+                    mdlMantCompra.show();
+                },
+                error: function (error) {
+                    alert("Error: " + error.statusText);
+                }
+            });
+        }
+
+        // EVENTO MODAL
+        document.getElementById("mdlMantCompra").addEventListener('hidden.bs.modal', function () {
+            // Evento cuando se cierra el modal
+            // Limpiar controles
+            $("#txtId").val("");
+            $("#txtProveedor").val("");
+        });
+
+        function fnConfirmarDatos() {
+            // Por defecto se desar guardar un registro nuevo
+            var urlAccion = '@Url.Action("Guardar","Compra")';
+
+            if (parseInt($("#txtId").val()) > 0) {
+                // Se desea modificar el registro
+                urlAccion = '@Url.Action("Modificar","Compra")';
+            }
+
+            $.ajax({
+                method: 'POST',
+                url: urlAccion,
+                data: $("#frmMantCompra").serialize(),
+                datatype: JSON,
+                success: function (resultado) {
+                    if (resultado > 0) {
+
+                        Swal.fire(
+                            'Listo',
+                            'Los datos se guardaron exitosamente',
+                            'success'
+                        )
+                        fnBuscar();
+                        mdlMantCompra.hide();
+                        gdDetalleCompra.limpiar();
+                    }
+                    else {
+                        Swal.fire(
+                            'Alerta',
+                            'Ocurrio un error al guardar los datos en el servidor',
+                            'warning'
+                        )
+                    }
+                },
+                error: function (error) {
+                    alert("Errro: " + error.statusText);
+                }
+            });
+        }
+        $("#btnConfirmar").click(function () {
+            fnConfirmarDatos();
+        });
+
+        // SECCION DE ELIMINAR
+                function fnEliminar(pId) {
+            Swal.fire({
+                title: 'Seguro',
+                text: "¿Está seguro de eliminar el registro seleccionado?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Si, eliminar!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                $.ajax({
+                    method: 'POST',
+                    url: '@Url.Action("Eliminar","Compra")',
+                    data: { 'Id': pId },
+                    datatype: JSON,
+                    success: function (resultado) {
+                        if (resultado > 0) {
+                            // alert("El registro se elimino exitosamente");
+                            Swal.fire(
+                                'Listo!',
+                                'El registro se elimino exitosamente.',
+                                'success'
+                            );
+                            fnBuscar();
+                        }
+                        else {
+                            //alert("Ocurrio un error al eliminar un registro en el servidor");
+                            Swal.fire(
+                                'Alerta!',
+                                'Ocurrio un error al eliminar el registro en el servidor',
+                                'warning'
+                            );
+                        }
+                    },
+                    error: function (error) {
+                        alert("Error: " + error.statusText);
+                    }
+                });
+                }
+            });
+        }
+
+        // ------------------ GRID DETAIL ---------------------
+        var gdDetalleCompra = new gridDetail("gdDetalleCompra");
+        gdDetalleCompra.selector = "tbDetalleCompra";
+        // Propiedad para almacenar los detalles de venta en memoria
+        gdDetalleCompra.lista = "Detalles";
+
+        function fnCargarDetalle(pObj) {
+            gdDetalleCompra.agregarDetalle(function (pGD) {
+                var cols = "";
+
+                cols += pGD.agregarCol("Id", pObj.Id, false);
+                cols += pGD.agregarCol("IdProducto", pObj.IdProducto, false);
+                cols += pGD.agregarCol("NombreProducto", pObj.NombreProducto, true, 240); // No es propiedad de DetalleVenta
+                cols += pGD.agregarCol("Precio", pObj.Precio);
+                cols += pGD.agregarCol("Cantidad", pObj.Cantidad);
+                cols += pGD.agregarCol("SubTotal", pObj.SubTotal);
+
+                return cols;
+            });
+        }
+
+        function fnAgregarProducto() {
+            var objDet = {};
+
+            objDet.Id = 0;
+            objDet.IdProducto = $("#slProducto").val();
+            objDet.NombreProducto = $("#slProducto option:selected").text();
+            objDet.Precio = parseFloat($("#txtPrecio").val());
+            objDet.Cantidad = parseInt($("#txtCantidad").val());
+            objDet.SubTotal = (parseFloat($("#txtPrecio").val()) * objDet.Cantidad).toFixed(2);
+            objDet.SubTotal = objDet.SubTotal;
+
+            if (objDet.IdProducto > 0 && objDet.Cantidad > 0) {
+                fnCargarDetalle(objDet);
+                $("#slProducto").val(0);
+                $("#txtPrecio").val("");
+                $("#txtCantidad").val("");
+            }
+            else {
+                Swal.fire(
+                    'Alerta!',
+                    'Por favor seleccione un producto e ingrese la cantidad',
+                    'warning'
+                );
+            }
+
+        }
+        // SECCION DE INICIALIZAR VISTA - DEJAR AL FINAL DEL SCRIPT JS
+        // Evento cuando la vista se carga en el navegador
+        $(document).ready(function () {
+            fnCargarListaProductos();
+            fnCargarListaProveedores();
+        });
+
+
+    </script>
+}

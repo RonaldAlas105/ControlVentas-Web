@@ -1,0 +1,101 @@
+﻿
+@*@{
+    ViewBag.Title = "Productos";
+    Layout = "~/Views/shared/_Layout.cshtml";
+}
+
+<div class="row justify-content-center">
+    <div class="col-7">
+        <form class="card text-bg-light mb-3" id="frmBuscar">
+            <div class="card-header text-center fw-bold h1 bg-primary text-light">Stock Disponible</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                        <label for="slProductoB" class="form-label"> Seleccionar Producto:</label>
+                        <select id="slProductoB" name="IdProducto" class="form-select"></select>
+                    </div>
+                    <div class="col-3 d-flex align-items-end">
+                        <button type="button" id="btnBuscar" class="btn btn-primary me-2">Buscar</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-7">
+        <table class="table table-striped table-bordered" id="tbDatosProducto">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Producto</th>
+                    <th>Precio de compra</th>
+                    <th>Precio de venta</th>
+                    <th>Fecha de ingreso</th>
+                    <th>Cantidad</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        //Sintaxis de JQUERY : $(selector).funcion()
+
+        //SECCION PARA CARGAR LISTA DE SELECCION / COMBOBOX
+        //LISTA PARA CATEGORIA
+        function fnCargarListaProductos() {
+            $.ajax({
+                method: 'POST',
+                url: '@Url.Action("ObtenerProductos","Inventario")',
+                datatype: JSON,
+                success: function (lista) {
+                    $("#slProducto, #slProductoB").append("<option value='0'> SELECCIONAR</option>");
+                    for (var i = 0; i < lista.length; i++) {
+                        $("#slProducto, #slProductoB").append("<option value='" + lista[i].Id + "'>" + lista[i].Nombre + "</option>");
+                    }
+                },
+                error: function (error) {
+                    alert("Error:" + error.statusText);
+                }
+
+            });
+        }
+        //SECCION DE BUSCAR
+        $("#btnBuscar").click(function () {
+            fnBuscar();
+        });
+        function fnBuscar() {
+            $.ajax({
+                method: 'POST',
+                url: '@Url.Action("Buscar","Producto")',
+                data: $("#frmBuscar").serialize(),
+                datatype: JSON,
+                success: function (lista) {
+                    var tbody = $("#tbDatosInventario > tbody");
+                    tbody.empty();
+                    for (var i = 0; i < lista.length; i++) {
+                        var fila = "<tr>\
+                                         <td>" + lista[i].Id + "</td>\
+                                         <td>" + lista[i].Producto.Nombre + "</td>\
+                                         <td>" + lista[i].PrecioCompra + "</td>\
+                                         <td>" + lista[i].PrecioVenta + "</td>\
+                                         <td>" + getDateTime(lista[i].FechaHoraIngreso) + "</td>\
+                                         <td>" + lista[i].Cantidad + "</td>\
+                                   </tr > ";
+                        tbody.append(fila);
+                    }
+                },
+                error: function (error) {
+                    alert("Error:" + error.statusText);
+                }
+            });
+        }
+        
+        //Seccion de inicializar vista-dejar al final del script JS
+        //Evento cunado la vista se carga en el navegador
+            $(document).ready(function () {
+                fnCargarListaProductos();
+            });
+    </script>
+}*@
+

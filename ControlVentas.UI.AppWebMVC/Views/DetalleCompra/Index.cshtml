@@ -1,0 +1,282 @@
+﻿
+@{
+    ViewBag.Title = "DetalleCompras";
+    Layout = "~/Views/shared/_Layout.cshtml";
+}
+
+<div class="row justify-content-center">
+    <div class="col-10">
+        <form class="card text-bg-light mb-3" id="frmBuscar">
+            <div class="card-header text-center fw-bold h1 text-dark"   style="background-color: #FFCA2C">Detalles de la compra.</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-3">
+                        <label for="txtNombreB" class="form-label"> Nombre:</label>
+                        <input type="text" class="form-control" name="Nombre" Id="txtNombreB">
+                    </div>
+                    <div class="col-3">
+                        <label for="slProductoB" class="form-label"> Seleccionar Producto:</label>
+                        <select id="slProductoB" name="IdProducto" class="form-select"></select>
+                    </div>
+                    <div class="col-3">
+                        <label for="slCompraB" class="form-label"> Seleccionar Compra:</label>
+                        <select id="slCompraB" name="IdCompra" class="form-select"></select>
+                    </div>
+                    <div class="col-3 d-flex align-items-end">
+                        <button type="button" id="btnBuscar" class="btn btn-primary me-2">Buscar</button>
+                        <button type="button" id="btnNuevo" class="btn btn-secondary  me-2">Nuevo</button>
+
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-10">
+        <table class="table table-striped table-bordered" id="tbDatosDetalleCompra">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Producto</th>
+                    <th>Compra</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Total</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+<!------------------------------------------------MODAL------------------------------------------>
+<div class="modal" tabindex="-1" id="mdlMantDetalleCompra">
+    <form class="modal-dialog" id="frmMantDetalleCompra">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mdlTitulo">Nuevo DetalleCompra</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="txtId" name="Id" />
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label for="slProducto" class="form-label">Seleccionar Producto: </label>
+                        <select id="slProducto" name="IdProducto" class="form-select" style="width:100%;"></select>
+                    </div>
+                    <div class="col-6">
+                        <label for="slCompra" class="form-label">Seleccionar Compra:</label>
+                        <select id="slCompra" name="IdCompra" class="form-select" style="width:100%;"></select>
+                    </div>
+                    <div class="col-6">
+                        <label for="txtPrecioCompra" class="form-label">Precio de compra:</label>
+                        <input type="text" id="txtPrecioCompra" name="PrecioCompra" class="form-control">
+                    </div>
+                    <div class="col-6">
+                        <label for="txtCantidad" class="form-label">Cantidad:</label>
+                        <input type="text" class="form-control" id="txtCantidad" name="Cantidad">
+                    </div>
+                    <div class="col-6">
+                        <label for="txtTotal" class="form-label">Total:</label>
+                        <input id="txtTotal" name="Total" type="text" class="form-control">
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="btnConfirmar" class="btn btn-primary ">Confirmar</button>
+
+            </div>
+        </div>
+    </form>
+</div>
+
+
+@section Scripts{
+    <script>
+        //Sintaxis de JQUERY : $(selector).funcion()
+
+        //SECCION PARA CARGAR LISTA DE SELECCION / COMBOBOX
+        //LISTA PARA CATEGORIA
+        function fnCargarListaProductos() {
+            $.ajax({
+                method: 'POST',
+                url: '@Url.Action("ObtenerProductos","DetalleCompra")',
+                datatype: JSON,
+                success: function (lista) {
+                    $("#slProducto, #slProductoB").append("<option value='0'> SELECCIONAR</option>");
+                    for (var i = 0; i < lista.length; i++) {
+                        $("#slProducto, #slProductoB").append("<option value='" + lista[i].Id + "'>" + lista[i].Nombre + "</option>");
+                    }
+                },
+                error: function (error) {
+                    alert("Error:" + error.statusText);
+                }
+
+            });
+        }
+
+        function fnCargarListaCompras() {
+            $.ajax({
+                method: 'POST',
+                url: '@Url.Action("ObtenerCompras", "DetalleCompra")',
+                datatype: JSON,
+                success: function (lista) {
+                    $("#slCompra, #slCompraB").append("<option value='0'> SELECCIONAR</option>");
+                    for (var i = 0; i < lista.length; i++) {
+                        $("#slCompra, #slCompraB").append("<option value='" + lista[i].Id + "'>" + lista[i].Nombre + "</option>");
+                    }
+                },
+                error: function (error) {
+                    alert("Error:" + error.statusText);
+                }
+
+            });
+        }
+        //SECCION DE BUSCAR
+        $("#btnBuscar").click(function () {
+            fnBuscar();
+        });
+        function fnBuscar() {
+            $.ajax({
+                method: 'POST',
+                url: '@Url.Action("Buscar","DetalleCompra")',
+                data: $("#frmBuscar").serialize(),
+                datatype: JSON,
+                success: function (lista) {
+                    var tbody = $("#tbDatosDetalleCompra > tbody");
+                    tbody.empty();
+                    for (var i = 0; i < lista.length; i++) {
+                        var fila = "<tr>\
+                                         <td>" + lista[i].Id + "</td>\
+                                         <td>" + lista[i].Producto.Nombre + "</td>\
+                                         <td>" + lista[i].Compra.Nombre +"</td>\
+                                         <td>" + lista[i].PrecioCompra + "</td>\
+                                         <td>" + lista[i].Cantidad +"</td>\
+                                         <td>" + lista[i].Total +"</td>\
+                                            <td>\
+                                                <button type='button' class='btn btn-warning me-2' onclick='fnObtenerDatosModificar(" + lista[i].Id +")'>Editar</button>\
+                                                <button type='button' class='btn btn-danger ' onclick='fnEliminar(" + lista[i].Id +")'>Eliminar</button> </td>\
+                                            </td >\
+                                   </tr > ";
+                        tbody.append(fila);
+                    }
+                },
+                error: function (error) {
+                    alert("Error:" + error.statusText);
+                }
+            });
+        }
+
+        //SECCION DE NUEVO Y EDITAR
+        const mdlMantDetalleCompra = new bootstrap.Modal('#mdlMantDetalleCompra', { keyboard: false, backdrop: 'static' });
+
+        $("#btnNuevo").click(function () {
+            $("#mdlTitulo").text("Nuevo producto");
+            mdlMantDetalleCompra.show();
+        });
+
+        function fnObtenerDatosModificar(pId) {
+            $.ajax({
+                method: 'POST',
+                url: '@Url.Action("BuscarPorId","DetalleCompra")',
+                data: { 'pId': pId },
+                datatype: JSON,
+                success: function (objDetalleCompra) {
+                    $("#txtId").val(objDetalleCompra.Id);
+                    $("#slProducto").val(objDetalleCompra.IdProducto);
+                    $("#slCompra").val(objDetalleCompra.IdCompra);
+                    $("#txtPrecioCompra").val(objDetalleCompra.PrecioCompra);
+                    $("#txtCantidad").val(objDetalleCompra.Cantidad);
+                    $("#txtTotal").val(objDetalleCompra.Total);
+                    $("#mdlTitulo").text("Editar producto");
+                    mdlMantDetalleCompra.show();
+                },
+                error: function (error) {
+                    alert("Error:" + error.statusText);
+                }
+            });
+        }
+
+        document.getElementById("mdlMantDetalleCompra").addEventListener('hidden.bs.modal', function () {
+            //Evento cunado se cierra el modal
+            //Limpriar controles del formulario modal
+            $("#txtId").val("");
+            $("#slProducto").val(0);
+            $("#slCompra").val(0);
+            $("#PrecioCompra").val("");
+            $("#txtCantidad").val("");
+            $("#txtTotal").val("");
+        });
+
+        function fnConfirmarDatos() {
+            //Por defecto se desea guardar un registro nuevo
+            var url = '@Url.Action("Guardar","DetalleCompra")';
+
+            if (parseInt($("#txtId").val()) > 0) {
+                //Se desea modificar el registro
+                url = '@Url.Action("Modificar","DetalleCompra")';
+            }
+
+            $.ajax({
+                method: 'POST',
+                url: url,
+                data: $("#frmMantDetalleCompra").serialize(),
+                datatype: JSON,
+                success: function (resultado) {
+                    if (resultado > 0) {
+                        alert("Los datos se guardaron exitosamente");
+                        fnBuscar();
+                        mdlMantDetalleCompra.hide();
+                    }
+                    else {
+                        alert("Ocurrio un error al guardar los datos en el servidor");
+                    }
+                },
+                error: function (error) {
+                    alert("Error:" + error.statusText);
+                }
+            });
+        }
+
+        $("#btnConfirmar").click(function () {
+            fnConfirmarDatos();
+        });
+
+        //SECCION DE ELIMINAR
+        function fnEliminar(pId) {
+            var confirmacion = confirm("¿Está seguro de eliminar el registro seleccionado?");
+            if (confirmacion) {
+                $.ajax({
+                    method: 'POST',
+                    url: '@Url.Action("Eliminar","DetalleCompra")',
+                    data: { 'Id': pId },
+                    datatype: JSON,
+                    success: function (resultado) {
+                        if (resultado > 0) {
+                            alert("El registro se elimino exitosamente");
+                            fnBuscar();
+                        }
+                        else {
+                            alert("Ocurrio un error al eliminar el registro en el servidor");
+                        }
+                    },
+                    error: function (error) {
+                        alert("Error:" + error.statusText);
+                    }
+                });
+            }
+        }
+
+
+
+
+        //Seccion de inicializar vista-dejar al final del script JS
+        //Evento cunado la vista se carga en el navegador
+        $(document).ready(function () {
+            fnCargarListaProductos();
+            fnCargarListaCompras();
+        });
+    </script>
+}
+

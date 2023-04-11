@@ -1,0 +1,106 @@
+﻿
+@{
+    ViewBag.Title = "Inicio de sesión";
+    Layout = "~/Views/shared/_Layout.cshtml";
+}
+
+
+<body>
+    <section>
+
+        <div class="row px-5">
+            <div class="col-sm-6">
+                <div class="">
+                    <div class="card-body mx-5">
+                        <h1 class="">Bienvenido.</h1>
+                        <p>Sistema de control de ventas y administración de Librery</p>
+                        <img src="~/Content/font/Diseño sin título.svg" class="container">
+                        <a class="card-link" href="@Url.Action("Informacion","Home")"><h5 class="mt-5 mb-3 text-center">Contáctanos</h5></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="">
+                    <div class="card-body">
+                        <main class="form-signin mx-5">
+                            <form class="row justify-content-center g-2" method="post" action="@Url.Action("Login", "Home")">
+                                <div>
+                                    <h2 class="mb-3 fw-bolder text-center">Inicio de sesion</h2>
+                                    @if  (TempData["SwalAlert2"] != null)
+                                      {
+                                       <script>
+                                           Swal.fire({
+                                               icon: "error",
+                                               title: "@TempData["SwalAlert2"]",
+                                               showConfirmButton: false,
+                                               timer: 1500
+
+                                           })
+                                       </script>
+    
+                                    }
+
+                                    <h5>Usuario</h5>
+                                    <div class="form-floating ">
+                                        <input type="text" class="form-control" name="NombreUsuario" required id="floatingInput" placeholder="">
+                                        <label for="floatingInput" class="form-label">Ingresa tu nombre de usuario</label><br />
+                                    </div>
+                                    <h5>Clave</h5>
+                                    <div class="form-floating ">
+                                        <input type="password" class="form-control" name="ClaveUsuario" required id="floatingPassword" placeholder="">
+                                        <label for="floatingPassword">Ingresa tu clave de usuario</label>
+                                    </div>
+
+                                    <div class="checkbox mb-3 text-center">
+                                        <br />
+                                        <input type="checkbox" value="remember-me"> ¿Recordar inicio de sesión?
+                                        <br />
+                                    </div>
+                                    <div class="w-100"></div>
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-primary btn-lg w-100">Entrar</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </main>
+                        <div>
+                            <div>
+                                <p class="mt-5 mb-3 text-muted text-center link-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"> <u>¿Olvidaste tu clave de usuario?</u> </p>
+
+                                <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+                                    <div class="offcanvas-header">
+                                        <h5 class="offcanvas-title" id="offcanvasRightLabel">Recuperación de contraseña</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                                    </div>
+                                    <div class="offcanvas-body">
+                                        <form>
+                                            <div class="mb-3">
+                                                <p>Debido a la situcion planteada notificaremos al gerente para que este se haga cargo del cometido , deberas llenar el siguiente formularion con la infromacion solicitada.</p>
+                                                <label class="form-label">Nombre completo.</label>
+                                                <input class="form-control">
+                                                <div class="mb-3">
+                                                    <label for="exampleInputEmail1" class="form-label">Usuario</label>
+                                                    <input type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Telefono</label>
+                                                <input class="form-control">
+                                            </div>
+
+                                            <button type="submit" class="btn btn-primary">Enviar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p class="mt-5 mb-3 text-muted text-center">&copy; Derechos reservados Librery SA de CV</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+</body>

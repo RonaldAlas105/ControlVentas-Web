@@ -1,0 +1,146 @@
+﻿@{ 
+    string ObtenerRol()
+    {
+        return Session["RolSesion"] != null ? Session["RolSesion"].ToString() : "";
+    }
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <meta charset="utf-8" />
+
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-icons.css" rel="stylesheet" />
+    <script src="~/Scripts/utilidades.js"></script>
+    <script src="~/Scripts/bootstrap.bundle.min.js"></script>
+    <script src="~/Scripts/jquery-3.6.0.min.js"></script>
+    <link href="~/Content/bootstrap-icons.css" rel="stylesheet" />
+    <script src="~/Scripts/sweetalert2.js"></script>
+    <link rel="icon" href="~/Content/font/journal-bookmark-fill.ico" />
+</head>
+<body>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="logo" viewBox="0 0 16 16">
+            <title>Logo</title>
+            <path fill-rule="evenodd" d="M6 1h6v7a.5.5 0 0 1-.757.429L9 7.083 6.757 8.43A.5.5 0 0 1 6 8V1z" />
+            <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2z" />
+            <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1z" />
+        </symbol>
+        <symbol id="home" viewBox="0 0 16 16">
+            <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4H2.5z" />
+        </symbol>
+        <symbol id="speedometer2" viewBox="0 0 16 16">
+            <path d="M8 4a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-1 0V4.5A.5.5 0 0 1 8 4zM3.732 5.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707zM2 10a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 10zm9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5zm.754-4.246a.389.389 0 0 0-.527-.02L7.547 9.31a.91.91 0 1 0 1.302 1.258l3.434-4.297a.389.389 0 0 0-.029-.518z" />
+            <path fill-rule="evenodd" d="M0 10a8 8 0 1 1 15.547 2.661c-.442 1.253-1.845 1.602-2.932 1.25C11.309 13.488 9.475 13 8 13c-1.474 0-3.31.488-4.615.911-1.087.352-2.49.003-2.932-1.25A7.988 7.988 0 0 1 0 10zm8-7a7 7 0 0 0-6.603 9.329c.203.575.923.876 1.68.63C4.397 12.533 6.358 12 8 12s3.604.532 4.923.96c.757.245 1.477-.056 1.68-.631A7 7 0 0 0 8 3z" />
+        </symbol>
+
+        <symbol id="people-circle" viewBox="0 0 16 16">
+            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+            <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z" />
+        </symbol>
+        <symbol id="grid" viewBox="0 0 16 16">
+            <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z" />
+        </symbol>
+        <symbol id="Salir" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z" />
+            <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z" />
+        </symbol>
+    </svg>
+ 
+    <nav >
+        <div class="px-1 py-1 "  style="background: #0D6EFD">
+            <nav class="container">
+                <nav class="d-flex flex-wrap">
+                    <a href="@Url.Action("Index","Home")" class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
+                        <svg class="bi bi-journal-bookmark-fill" width="40" height="40" fill="currentColor" ><use xlink:href="#logo" /></svg>
+                        <h1 class="text-white">Bookshop</h1>
+                    </a>
+
+                    <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
+                        @if (ObtenerRol() == "Administrador")
+                        {
+                            <li>
+                                <a href="@Url.Action("Index","Home")" class="nav-link text-secondary text-white ">
+                                    <svg class="bi d-block mx-auto mb-1" width="20" height="20" fill="currentColor"><use xlink:href="#home" /></svg>
+                                    Inicio
+                                </a>
+                            </li>
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-secondary text-white" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <svg class="bi d-block mx-auto mb-1" width="20" height="20" fill="currentColor"><use xlink:href="#speedometer2" /></svg>
+                                    Mantenimiento
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item btn-warning btn" href="@Url.Action("index","Rol")">Roles</a></li>
+                                    <li><a class="dropdown-item btn-warning btn" href="@Url.Action("index","Marca")">Marcas</a></li>
+                                    <li><a class="dropdown-item btn-warning btn" href="@Url.Action("index","Cliente")">Clientes</a></li>
+                                    <li><a class="dropdown-item btn-warning btn" href="@Url.Action("index","Usuario")">Usuarios</a></li>
+                                    <li><a class="dropdown-item btn-warning btn" href="@Url.Action("VerProductos","Producto")">Productos</a></li>
+                                    <li><a class="dropdown-item btn-warning btn" href="@Url.Action("index","Categoria")">Categorias</a></li>
+                                    <li><a class="dropdown-item btn-warning btn" href="@Url.Action("index","Compra")">Mercaderia</a></li>
+                                    <li><a class="dropdown-item btn-warning btn" href="@Url.Action("index","Proveedor")">Proveedores</a></li>
+                                    <li><a class="dropdown-item btn-warning btn text-center fw-bold " href="@Url.Action("Mant","Home")">Ver mas...</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="@Url.Action("VerProductos","Producto")" class="nav-link text-secondary text-white btn">
+                                    <svg class="bi d-block mx-auto mb-1" width="20" height="20" fill="currentColor"><use xlink:href="#grid" /></svg>
+                                    Productos
+                                </a>
+                            </li>
+                            <li>
+                                <a href="@Url.Action("Index","Usuario")" class="nav-link text-secondary text-white btn">
+                                    <svg class="bi d-block mx-auto mb-1" fill="currentColor" width="20" height="20"><use xlink:href="#people-circle" /></svg>
+                                    Usuarios
+                                </a>
+                            </li>
+                            <li>
+                                <a href="@Url.Action("Salir","Home")" class="nav-link text-secondary text-white btn btn-danger">
+                                    <svg class="bi bi-box-arrow-right  mx-auto mb-1" fill="currentColor" width="20" height="20"><use xlink:href="#Salir" /></svg> <br />
+                                    Salir
+                                </a>
+                            </li>
+                        }
+                        else if (ObtenerRol() == "Vendedor")
+                        {
+                            <li>
+                                <a href="@Url.Action("Index","Home")" class="nav-link text-secondary text-white ">
+                                    <svg class="bi d-block mx-auto mb-1" width="20" height="20" fill="currentColor"><use xlink:href="#home" /></svg>
+                                    Inicio
+                                </a>
+                            </li>
+                            <li>
+                                <a href="@Url.Action("Index","Producto")" class="nav-link text-secondary text-white btn">
+                                    <svg class="bi d-block mx-auto mb-1" width="20" height="20" fill="currentColor"><use xlink:href="#grid" /></svg>
+                                    Productos
+                                </a>
+                            </li>
+                            <li>
+                                <a href="@Url.Action("Salir","Home")" class="nav-link text-secondary text-white btn btn-danger">
+                                    <svg class="bi bi-box-arrow-right  mx-auto mb-1" fill="currentColor" width="20" height="20"><use xlink:href="#Salir" /></svg> <br />
+                                    Salir
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </nav>
+        </div>
+    </nav>
+
+    <min class="container">
+        <div class="row pt-3">
+            <div class="col-12">
+                @RenderBody()
+            </div>
+        </div>
+    </min>
+
+    @RenderSection("Scripts", false)
+
+</body>
+</html>
